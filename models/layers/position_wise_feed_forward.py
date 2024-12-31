@@ -1,6 +1,6 @@
 from torch import nn
 
-class FeedForward(nn.Module):
+class PositionWiseFeedForward(nn.Module):
     def __init__(self, d_model=512, d_hidden=4*512, drop_prob=0.1):
         super().__init__()
 

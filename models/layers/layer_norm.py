@@ -1,15 +1,20 @@
-from torch import mean, std, nn
+from torch import nn, ones, zeros, sqrt
 
 
-class AddLayerNorm(nn.Module):
-    def __init__(self):
+class LayerNorm(nn.Module):
+    def __init__(self, d_model=512, epsilon=1e-12):
         super().__init__()
+        
+        self.gamma = nn.Parameter(ones(d_model))
+        self.beta = nn.Parameter(zeros(d_model))
+        self.epsilon = epsilon
 
-    def layer_norm(self, x):
-        mean = mean(x, dim=-1, keepdim=True)
-        std = std(x, dim=-1, keepdim=True)
+    def forward(self, x):
+        mean = x.mean(-1, keepdim=True)
+        var = x.var(-1, unbiased=True, keepdim=True)
+        # -1 means the last dimension
 
-        return (x - mean) / std
+        x = (x - mean) / sqrt(var + self.epsilon)
+        x = self.gamma * x + self.beta
 
-    def forward(self, x, residual):
-        return residual + self.layer_norm(x)
+        return x
